@@ -14,7 +14,7 @@ setup(
         (os.path.join("share", package_name, "config"), glob("config/*.yaml")),
         (os.path.join("share", package_name, "launch"), glob("launch/*.py")),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'python-dotenv'],
     zip_safe=True,
     maintainer='Alp SARICA',
     maintainer_email='alp.sarica@eteration.com',

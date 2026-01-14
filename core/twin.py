@@ -22,11 +22,13 @@ import rclpy
 from rclpy.node import Node
 
 from core.twin_services import TwinServices
+from core.auth import JWTAuthenticator, JWTConfig
 
 import uuid
 import json
 import requests
 import socket
+from urllib.parse import urlparse
 
 class Twin(Node):
     """
@@ -80,6 +82,14 @@ class Twin(Node):
         self.declare_parameter("topic", "")
         self.declare_parameter("thing_id", "")
 
+        # Authentication parameters
+        self.declare_parameter("auth_method", "basic")
+        self.declare_parameter("auth_url", "")
+        self.declare_parameter("auth_client_id", "")
+        self.declare_parameter("auth_client_secret", "")
+        self.declare_parameter("auth_username", "")
+        self.declare_parameter("auth_password", "")
+
         # Initialize Parameters
         self.twin_url = self.get_parameter("twin_url").value
         self.anonymous = self.get_parameter("anonymous").value
@@ -91,6 +101,27 @@ class Twin(Node):
         self.definition = self.get_parameter("definition").value
         self.topic = f"{self.namespace}:{self.unique_name}"
         self.thing_id = f"{self.namespace}:{self.name}"
+
+        # Initialize authentication
+        self.auth_method = self.get_parameter("auth_method").value
+        self.jwt_authenticator = None
+
+        if self.auth_method == "jwt":
+            jwt_config = JWTConfig.from_params(
+                auth_url=self.get_parameter("auth_url").value,
+                client_id=self.get_parameter("auth_client_id").value,
+                client_secret=self.get_parameter("auth_client_secret").value,
+                username=self.get_parameter("auth_username").value,
+                password=self.get_parameter("auth_password").value
+            )
+            if jwt_config:
+                self.jwt_authenticator = JWTAuthenticator(jwt_config)
+                self.get_logger().info("JWT authentication configured for device registration.")
+            else:
+                self.get_logger().error(
+                    "JWT auth_method selected but credentials are incomplete. "
+                    "Check auth_url, auth_client_id, auth_client_secret, auth_username, auth_password in config or environment variables."
+                )
 
         self.internet_status = False
         self.is_device_registered = False
@@ -173,6 +204,27 @@ class Twin(Node):
 
         return context
 
+    def _get_registration_url(self) -> str:
+        """Get the base URL for device registration, stripping credentials if present."""
+        parsed = urlparse(self.twin_url)
+        if parsed.username:
+            # URL contains credentials, strip them for JWT auth
+            return f"{parsed.scheme}://{parsed.hostname}{':' + str(parsed.port) if parsed.port else ''}{parsed.path}"
+        return self.twin_url
+
+    def _get_auth_headers(self, content_type: str) -> dict:
+        """Get headers for registration requests, including auth if JWT is configured."""
+        headers = {"Content-type": content_type}
+
+        if self.auth_method == "jwt" and self.jwt_authenticator:
+            try:
+                auth_headers = self.jwt_authenticator.get_auth_headers()
+                headers.update(auth_headers)
+            except Exception as e:
+                self.get_logger().error(f"Failed to get JWT token: {e}")
+
+        return headers
+
     def register_device(self):
         """
         Registers the device with the twin server.
@@ -182,12 +234,22 @@ class Twin(Node):
         If the PATCH request results in a 404 status code, it attempts a PUT request with the initial data.
         The method logs the success or failure of the registration process and updates the device's registration status.
 
+        Authentication method is controlled by the 'auth_method' parameter:
+        - "basic": Uses credentials embedded in twin_url (default)
+        - "jwt": Uses JWT token from Keycloak
+
         Returns:
             int: The HTTP status code from the final registration attempt.
         """
+        # Use appropriate URL based on auth method
+        if self.auth_method == "jwt" and self.jwt_authenticator:
+            base_url = self._get_registration_url()
+        else:
+            base_url = self.twin_url
+
         res = requests.patch(
-            f"{self.twin_url}/api/2/things/{self.thing_id}",
-            headers={"Content-type": "application/merge-patch+json"},
+            f"{base_url}/api/2/things/{self.thing_id}",
+            headers=self._get_auth_headers("application/merge-patch+json"),
             json=self.device_register_data()
         )
 
@@ -195,16 +257,16 @@ class Twin(Node):
             data = self.device_register_data()
             data['policyId'] = self.thing_id
             res = requests.put(
-                f"{self.twin_url}/api/2/things/{self.thing_id}",
-                headers={"Content-type": "application/json"},
+                f"{base_url}/api/2/things/{self.thing_id}",
+                headers=self._get_auth_headers("application/json"),
                 json=data
             )
-        
+
         if res.status_code == 404:
             data = self.device_register_data()
             res = requests.put(
-                f"{self.twin_url}/api/2/things/{self.thing_id}",
-                headers={"Content-type": "application/json"},
+                f"{base_url}/api/2/things/{self.thing_id}",
+                headers=self._get_auth_headers("application/json"),
                 json=data
             )
 
@@ -213,7 +275,7 @@ class Twin(Node):
             self.is_device_registered = True
         else:
             self.get_logger().warn(
-                f"Device registration was unsuccessful. Status Code: {res.status_code}.")
+                f"Device registration was unsuccessful. Status Code: {res.status_code}. Text: {res.text}")
 
         return res.status_code
 
@@ -364,9 +426,13 @@ class Twin(Node):
         If the connection is successful and the device is not registered, it calls the `register_device` method.
         The internet connection status is then updated accordingly. If the connection fails, it logs a warning message.
         """
-        try:     
+        try:
+            # Extract hostname from URL, handling both basic auth and clean URLs
+            parsed = urlparse(self.twin_url)
+            host = parsed.hostname
+
             self.socket_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket_.connect((self.twin_url.split("@")[1], 1883))
+            self.socket_.connect((host, 1883))
 
             if not self.is_device_registered:
                 self.register_device()
