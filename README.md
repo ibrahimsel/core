@@ -1,6 +1,9 @@
 # Muto Core
 
 [![CI](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml)
+![ROS 2 Foxy](https://img.shields.io/badge/ROS%202-Foxy-blue)
+![ROS 2 Humble](https://img.shields.io/badge/ROS%202-Humble-blue)
+![ROS 2 Jazzy](https://img.shields.io/badge/ROS%202-Jazzy-blue)
 
 **Muto Core** is the digital twin bridge that manages device registration, connectivity, telemetry, and stack state with a remote twin server (Eclipse Ditto).
 
