@@ -12,7 +12,6 @@
 #
 
 import json
-import socket
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -382,7 +381,7 @@ class TestTwin(unittest.TestCase):
 
         self.node.twin_url = "device@server"
 
-        mock_socket.node.connect.side_effect = socket.error("Connection failed")
+        mock_socket.node.connect.side_effect = OSError("Connection failed")
 
         with patch.object(self.node, "get_logger") as mock_logger:
             self.node.connection_status()

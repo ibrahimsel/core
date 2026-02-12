@@ -1,29 +1,22 @@
 #
-#  Copyright (c) 2023 Composiv.ai
+# Copyright (c) 2023 Composiv.ai
 #
-# All rights reserved. This program and the accompanying materials
-# are made available under the terms of the Eclipse Public License v2.0
-# and Eclipse Distribution License v1.0 which accompany this distribution.
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0.
 #
-# Licensed under the  Eclipse Public License v2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# The Eclipse Public License is available at
-#    http://www.eclipse.org/legal/epl-v20.html
-# and the Eclipse Distribution License is available at
-#   http://www.eclipse.org/org/documents/edl-v10.php.
+# SPDX-License-Identifier: EPL-2.0
 #
 # Contributors:
-#    Composiv.ai - initial API and implementation
+#   Composiv.ai - initial API and implementation
 #
-#
-
-from muto_msgs.srv import CoreTwin
 
 import json
 
+from muto_msgs.srv import CoreTwin
 
-class TwinServices():
+
+class TwinServices:
     """ # TODO add docs."""
 
     def __init__(self, node, nname):
@@ -57,11 +50,11 @@ class TwinServices():
             response: The modified service response object with the `output` attribute set to the JSON string of the current stack properties.
         """
         stack = self.node.get_current_properties()
-        
+
         response.output = json.dumps(stack)
 
         return response
-    
+
     def callback_get_stack_definition(self, request, response):
         """
         Service callback to get the stack definition for a given stack ID.
@@ -79,11 +72,11 @@ class TwinServices():
         """
         stack_id = request.input
         definition = self.node.get_stack_definition(stack_id)
-        
+
         response.output = json.dumps(definition)
 
         return response
-    
+
     def callback_set_current_stack(self, request, response):
         """
         Handles the service request to set the current stack of the device.
@@ -105,7 +98,7 @@ class TwinServices():
         response.output = str(status_code)
 
         return response
-    
+
     def callback_get_context(self, request, response):
         """
         Callback method to handle requests for the device context.
@@ -122,7 +115,7 @@ class TwinServices():
             response: The service response object with the context information in the output field.
         """
         context = self.node.get_context()
-        
+
         response.output = json.dumps(context)
 
         return response
@@ -147,7 +140,7 @@ class TwinServices():
         response.output = str(status_code)
 
         return response
-    
+
     def callback_get_registered_telemetries(self, request, response):
         """
         Retrieves registered telemetry properties from the twin server.
@@ -168,7 +161,7 @@ class TwinServices():
         response.output = telemetry_data
 
         return response
-    
+
     def callback_register_telemetry(self, request, response):
         """
         Registers telemetry with the twin server.
@@ -214,7 +207,7 @@ class TwinServices():
         response.output = str(status_code)
 
         return response
-    
+
     def callback_get_internet_status(self, request, response):
         """
         Retrieves the internet connection status.
@@ -233,4 +226,3 @@ class TwinServices():
         response.output = str(self.node.internet_status)
 
         return response
-        

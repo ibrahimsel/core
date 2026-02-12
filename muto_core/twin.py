@@ -1,34 +1,28 @@
 #
-#  Copyright (c) 2025 Composiv.ai
+# Copyright (c) 2025 Composiv.ai
 #
-# All rights reserved. This program and the accompanying materials
-# are made available under the terms of the Eclipse Public License v2.0
-# and Eclipse Distribution License v1.0 which accompany this distribution.
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0.
 #
-# Licensed under the  Eclipse Public License v2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# The Eclipse Public License is available at
-#    http://www.eclipse.org/legal/epl-v20.html
-# and the Eclipse Distribution License is available at
-#   http://www.eclipse.org/org/documents/edl-v10.php.
+# SPDX-License-Identifier: EPL-2.0
 #
 # Contributors:
-#    Composiv.ai - initial API and implementation
-#
+#   Composiv.ai - initial API and implementation
 #
 
 from __future__ import annotations
 
+import json
+import socket
+import uuid
+
 import rclpy
+import requests
 from rclpy.node import Node
 
 from muto_core.twin_services import TwinServices
 
-import uuid
-import json
-import requests
-import socket
 
 class Twin(Node):
     """
@@ -156,7 +150,7 @@ class Twin(Node):
         headers = {'Content-type': 'application/json'}
 
         if stack_id:
-            r = requests.put(self.twin_url + "/api/2/things/{}/features/stack/properties/current".format(self.thing_id),
+            r = requests.put(self.twin_url + f"/api/2/things/{self.thing_id}/features/stack/properties/current",
                              headers=headers, json={"stackId": stack_id, "state": state})
             self.get_logger().info(f"Status Code: {r.status_code}, Response: {r.text}")
 
@@ -201,7 +195,7 @@ class Twin(Node):
                 headers={"Content-type": "application/json"},
                 json=data
             )
-        
+
         if res.status_code == 404:
             data = self.device_register_data()
             res = requests.put(
@@ -211,7 +205,7 @@ class Twin(Node):
             )
 
         if res.status_code == 201 or res.status_code == 204:
-            self.get_logger().info(f"Device registered successfully.")
+            self.get_logger().info("Device registered successfully.")
             self.is_device_registered = True
         else:
             self.get_logger().warn(
@@ -237,7 +231,7 @@ class Twin(Node):
         )
 
         if res.status_code == 200:
-            self.get_logger().info(f"Telemetry properties received successfully.")
+            self.get_logger().info("Telemetry properties received successfully.")
         else:
             self.get_logger().warn(
                 f"Getting telemetry properties was unsuccessful - {res.status_code} {res.text}.")
@@ -285,9 +279,9 @@ class Twin(Node):
         )
 
         if res.status_code == 201:
-            self.get_logger().info(f"Telemetry registered successfully.")
+            self.get_logger().info("Telemetry registered successfully.")
         elif res.status_code == 204:
-            self.get_logger().info(f"Telemetry modified successfully.")
+            self.get_logger().info("Telemetry modified successfully.")
         else:
             self.get_logger().warn(
                 f"Telemetry registration was unsuccessful - {res.status_code}.")
@@ -331,7 +325,7 @@ class Twin(Node):
         )
 
         if res.status_code == 204:
-            self.get_logger().info(f"Telemetry deleted successfully.")
+            self.get_logger().info("Telemetry deleted successfully.")
         else:
             self.get_logger().warn(
                 f"Telemetry deletion was unsuccessful - {res.status_code}.")
@@ -366,7 +360,7 @@ class Twin(Node):
         If the connection is successful and the device is not registered, it calls the `register_device` method.
         The internet connection status is then updated accordingly. If the connection fails, it logs a warning message.
         """
-        try:     
+        try:
             self.socket_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_.connect((self.twin_url.split("@")[1], 1883))
 
@@ -374,7 +368,7 @@ class Twin(Node):
                 self.register_device()
 
             self.internet_status = True
-        except socket.error as ex:
+        except OSError as ex:
             self.internet_status = False
             self.get_logger().warn(f"Twin Server ping failed: {ex}")
         finally:
