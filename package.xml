@@ -5,10 +5,16 @@
   <version>0.42.0</version>
   <description>Eclipse Muto Core - digital twin bridge that manages device registration, connectivity, telemetry, and stack state with a remote twin server</description>
   <maintainer email="alp.sarica@eteration.com">Alp SARICA</maintainer>
-  <license>Eclipse Public License v2.0</license>
+  <license file="LICENSE">EPL-2.0</license>
+
+  <url type="website">https://eclipse.dev/muto/</url>
+  <url type="repository">https://github.com/eclipse-muto/core</url>
+  <url type="bugtracker">https://github.com/eclipse-muto/core/issues</url>
+
+  <buildtool_depend>ament_python</buildtool_depend>
 
   <test_depend>python3-pytest</test_depend>
-  
+
   <depend>python3-requests</depend>
   <depend>muto_msgs</depend>
 

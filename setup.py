@@ -20,6 +20,7 @@ setup(
     maintainer_email='alp.sarica@eteration.com',
     description='Eclipse Muto Core - digital twin bridge that manages device registration, connectivity, telemetry, and stack state with a remote twin server',
     license='Eclipse Public License v2.0',
+    python_requires='>=3.10',
     entry_points={
         'console_scripts': [
             'twin = muto_core.twin:main'
