@@ -1,9 +1,10 @@
 # Muto Core
 
-[![CI](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml)
-![ROS 2 Foxy](https://img.shields.io/badge/ROS%202-Foxy-blue)
-![ROS 2 Humble](https://img.shields.io/badge/ROS%202-Humble-blue)
-![ROS 2 Jazzy](https://img.shields.io/badge/ROS%202-Jazzy-blue)
+| ROS 2 Distro | Ubuntu | Python | Status |
+|---|---|---|---|
+| Foxy | 20.04 | 3.8 | [![Foxy](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml) |
+| Humble | 22.04 | 3.10 | [![Humble](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml) |
+| Jazzy | 24.04 | 3.12 | [![Jazzy](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/colcon-build.yaml) |
 
 **Muto Core** is the digital twin bridge that manages device registration, connectivity, telemetry, and stack state with a remote twin server (Eclipse Ditto).
 
