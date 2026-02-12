@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>core</name>
+  <name>muto_core</name>
   <version>0.42.0</version>
   <description>Eclipse Muto Core - digital twin bridge that manages device registration, connectivity, telemetry, and stack state with a remote twin server</description>
   <maintainer email="alp.sarica@eteration.com">Alp SARICA</maintainer>

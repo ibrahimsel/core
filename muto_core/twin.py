@@ -21,7 +21,7 @@
 import rclpy
 from rclpy.node import Node
 
-from core.twin_services import TwinServices
+from muto_core.twin_services import TwinServices
 
 import uuid
 import json

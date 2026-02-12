@@ -18,7 +18,7 @@ from unittest.mock import MagicMock, patch
 
 import rclpy
 
-from core.twin import Twin
+from muto_core.twin import Twin
 
 
 class TestTwin(unittest.TestCase):

@@ -18,7 +18,7 @@ from unittest.mock import MagicMock, patch
 import rclpy
 # from muto_msgs.srv import CoreTwin
 
-from core.twin_services import TwinServices
+from muto_core.twin_services import TwinServices
 
 
 class TestTwinServices(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestTwinServices(unittest.TestCase):
     def setUpClass(cls) -> None:
         rclpy.init()
 
-    @patch("core.twin_services.CoreTwin")
+    @patch("muto_core.twin_services.CoreTwin")
     def setUp(self, mock_core_twin):
         self.mock_node = MagicMock()
 

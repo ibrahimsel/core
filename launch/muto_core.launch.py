@@ -24,19 +24,19 @@ from ament_index_python.packages import get_package_share_directory
 
 import os
 
-pkg_name = "agent"
+pkg_name = "muto_core"
 output = "screen"
 
 def generate_launch_description():
 
     # Files
-    file_core = os.path.join(get_package_share_directory("core"), "config", "core.yaml")
+    file_core = os.path.join(get_package_share_directory("muto_core"), "config", "muto_core.yaml")
 
 
     # Nodes
     node_twin = Node(
         name="core_twin",
-        package="core",
+        package="muto_core",
         executable="twin",
         output=output,
         parameters=[file_core]
