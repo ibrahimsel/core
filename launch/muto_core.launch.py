@@ -21,21 +21,14 @@ from launch import LaunchDescription
 pkg_name = "muto_core"
 output = "screen"
 
+
 def generate_launch_description():
 
     # Files
     file_core = os.path.join(get_package_share_directory("muto_core"), "config", "muto_core.yaml")
 
-
     # Nodes
-    node_twin = Node(
-        name="core_twin",
-        package="muto_core",
-        executable="twin",
-        output=output,
-        parameters=[file_core]
-    )
-
+    node_twin = Node(name="core_twin", package="muto_core", executable="twin", output=output, parameters=[file_core])
 
     # Launch Description Object
     ld = LaunchDescription()

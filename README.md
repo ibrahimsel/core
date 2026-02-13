@@ -2,9 +2,9 @@
 
 | ROS 2 Distro | Ubuntu | Python | Status |
 |---|---|---|---|
-| Foxy | 20.04 | 3.8 | [![Foxy](https://github.com/eclipse-muto/core/actions/workflows/ci-foxy.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/ci-foxy.yaml) |
-| Humble | 22.04 | 3.10 | [![Humble](https://github.com/eclipse-muto/core/actions/workflows/ci-humble.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/ci-humble.yaml) |
-| Jazzy | 24.04 | 3.12 | [![Jazzy](https://github.com/eclipse-muto/core/actions/workflows/ci-jazzy.yaml/badge.svg)](https://github.com/eclipse-muto/core/actions/workflows/ci-jazzy.yaml) |
+| Foxy | 20.04 | 3.8 | [![Foxy](https://github.com/ibrahimsel/core/actions/workflows/ci-foxy.yaml/badge.svg)](https://github.com/ibrahimsel/core/actions/workflows/ci-foxy.yaml) |
+| Humble | 22.04 | 3.10 | [![Humble](https://github.com/ibrahimsel/core/actions/workflows/ci-humble.yaml/badge.svg)](https://github.com/ibrahimsel/core/actions/workflows/ci-humble.yaml) |
+| Jazzy | 24.04 | 3.12 | [![Jazzy](https://github.com/ibrahimsel/core/actions/workflows/ci-jazzy.yaml/badge.svg)](https://github.com/ibrahimsel/core/actions/workflows/ci-jazzy.yaml) |
 
 **Muto Core** is the digital twin bridge that manages device registration, connectivity, telemetry, and stack state with a remote twin server (Eclipse Ditto).
 
