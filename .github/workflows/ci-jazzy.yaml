@@ -42,5 +42,4 @@ jobs:
           cd /tmp/ws
           . /opt/ros/jazzy/setup.sh
           . install/setup.sh
-          colcon test --packages-select muto_core --event-handlers console_direct+
-          colcon test-result --verbose
+          python -m pytest src/core/test/ -v
