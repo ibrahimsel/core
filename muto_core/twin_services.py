@@ -97,7 +97,14 @@ class TwinServices:
             response: The response with the status code as a string in the output attribute.
         """
         payload = request.input
-        status_code = self.node.set_current_stack(payload)
+        try:
+            data = json.loads(payload)
+            stack_id = data.get("stackId", payload)
+            state = data.get("state", "unknown")
+        except (json.JSONDecodeError, TypeError):
+            stack_id = payload
+            state = "unknown"
+        status_code = self.node.set_current_stack(stack_id, state=state)
 
         response.output = str(status_code)
 

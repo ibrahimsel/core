@@ -78,13 +78,26 @@ class TestTwinServices(unittest.TestCase):
 
     def test_callback_set_current_stack(self):
         request = MagicMock().Request()
-        request.input = '{"stack_config": "test_input_config"}'
+        request.input = '{"stackId": "test_stack_123", "state": "started"}'
         response = MagicMock().Response()
 
         response = self.twin_services.callback_set_current_stack(request, response)
 
         self.mock_node.set_current_stack.assert_called_once_with(
-            '{"stack_config": "test_input_config"}'
+            "test_stack_123", state="started"
+        )
+
+        self.assertEqual(response.output, "200")
+
+    def test_callback_set_current_stack_plain_string(self):
+        request = MagicMock().Request()
+        request.input = "plain_stack_id"
+        response = MagicMock().Response()
+
+        response = self.twin_services.callback_set_current_stack(request, response)
+
+        self.mock_node.set_current_stack.assert_called_once_with(
+            "plain_stack_id", state="unknown"
         )
 
         self.assertEqual(response.output, "200")
