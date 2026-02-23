@@ -17,8 +17,8 @@ setup(
     ],
     install_requires=["setuptools"],
     zip_safe=True,
-    maintainer="Alp SARICA",
-    maintainer_email="alp.sarica@eteration.com",
+    maintainer="composiv.ai",
+    maintainer_email="info@composiv.ai",
     description=(
         "Eclipse Muto Core - digital twin bridge that manages device registration,"
         " connectivity, telemetry, and stack state with a remote twin server"
