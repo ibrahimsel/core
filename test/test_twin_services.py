@@ -16,9 +16,9 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 import rclpy
-# from muto_msgs.srv import CoreTwin
 
-from core.twin_services import TwinServices
+# from muto_msgs.srv import CoreTwin
+from muto_core.twin_services import TwinServices
 
 
 class TestTwinServices(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestTwinServices(unittest.TestCase):
     def setUpClass(cls) -> None:
         rclpy.init()
 
-    @patch("core.twin_services.CoreTwin")
+    @patch("muto_core.twin_services.CoreTwin")
     def setUp(self, mock_core_twin):
         self.mock_node = MagicMock()
 
@@ -78,13 +78,26 @@ class TestTwinServices(unittest.TestCase):
 
     def test_callback_set_current_stack(self):
         request = MagicMock().Request()
-        request.input = '{"stack_config": "test_input_config"}'
+        request.input = '{"stackId": "test_stack_123", "state": "started"}'
         response = MagicMock().Response()
 
         response = self.twin_services.callback_set_current_stack(request, response)
 
         self.mock_node.set_current_stack.assert_called_once_with(
-            '{"stack_config": "test_input_config"}'
+            "test_stack_123", state="started"
+        )
+
+        self.assertEqual(response.output, "200")
+
+    def test_callback_set_current_stack_plain_string(self):
+        request = MagicMock().Request()
+        request.input = "plain_stack_id"
+        response = MagicMock().Response()
+
+        response = self.twin_services.callback_set_current_stack(request, response)
+
+        self.mock_node.set_current_stack.assert_called_once_with(
+            "plain_stack_id", state="unknown"
         )
 
         self.assertEqual(response.output, "200")

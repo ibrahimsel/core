@@ -1,32 +1,28 @@
 #
-#  Copyright (c) 2025 Composiv.ai
+# Copyright (c) 2025 Composiv.ai
 #
-# All rights reserved. This program and the accompanying materials
-# are made available under the terms of the Eclipse Public License v2.0
-# and Eclipse Distribution License v1.0 which accompany this distribution.
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0.
 #
-# Licensed under the  Eclipse Public License v2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# The Eclipse Public License is available at
-#    http://www.eclipse.org/legal/epl-v20.html
-# and the Eclipse Distribution License is available at
-#   http://www.eclipse.org/org/documents/edl-v10.php.
+# SPDX-License-Identifier: EPL-2.0
 #
 # Contributors:
-#    Composiv.ai - initial API and implementation
+#   Composiv.ai - initial API and implementation
 #
-#
+
+from __future__ import annotations
+
+import json
+import socket
+import uuid
 
 import rclpy
+import requests
 from rclpy.node import Node
 
-from core.twin_services import TwinServices
+from muto_core.twin_services import TwinServices
 
-import uuid
-import json
-import requests
-import socket
 
 class Twin(Node):
     """
@@ -119,8 +115,7 @@ class Twin(Node):
         try:
             if (not self.twin_url) or (not thing_id):
                 return None
-            r = requests.get(url=self.twin_url + "/api/2/things/" +
-                             thing_id + "/features/stack")
+            r = requests.get(url=self.twin_url + "/api/2/things/" + thing_id + "/features/stack")
             self.get_logger().info(f"Stack getting Status Code: {r.status_code}")
 
             if r.status_code >= 300:
@@ -129,21 +124,13 @@ class Twin(Node):
             return payload.get("properties", {})
 
         except requests.exceptions.Timeout as t:
-            self.get_logger().error(
-                f"Request timed out when trying to get stack from twins repo: {t}"
-            )
+            self.get_logger().error(f"Request timed out when trying to get stack from twins repo: {t}")
         except requests.exceptions.RequestException as r:
-            self.get_logger().error(
-                f"Request error when trying to get stack from twins repo: {r}"
-            )
+            self.get_logger().error(f"Request error when trying to get stack from twins repo: {r}")
         except json.JSONDecodeError as j:
-            self.get_logger().error(
-                f"Failed to decode JSON response when getting stack from twins repo: {j}"
-            )
+            self.get_logger().error(f"Failed to decode JSON response when getting stack from twins repo: {j}")
         except Exception as e:
-            self.get_logger().error(
-                f"Unexpected error when trying to get stack from twins repo: {e}"
-            )
+            self.get_logger().error(f"Unexpected error when trying to get stack from twins repo: {e}")
         return None
 
     def set_current_stack(self, stack_id: str, state: str = "unknown"):
@@ -151,13 +138,15 @@ class Twin(Node):
         if not stack_id:
             return
 
-        headers = {'Content-type': 'application/json'}
+        headers = {"Content-type": "application/json"}
 
         if stack_id:
-            r = requests.put(self.twin_url + "/api/2/things/{}/features/stack/properties/current".format(self.thing_id),
-                             headers=headers, json={"stackId": stack_id, "state": state})
+            r = requests.put(
+                self.twin_url + f"/api/2/things/{self.thing_id}/features/stack/properties/current",
+                headers=headers,
+                json={"stackId": stack_id, "state": state},
+            )
             self.get_logger().info(f"Status Code: {r.status_code}, Response: {r.text}")
-
 
     def get_context(self):
         """Return information about the device."""
@@ -188,32 +177,27 @@ class Twin(Node):
         res = requests.patch(
             f"{self.twin_url}/api/2/things/{self.thing_id}",
             headers={"Content-type": "application/merge-patch+json"},
-            json=self.device_register_data()
+            json=self.device_register_data(),
         )
 
         if res.status_code == 400:
             data = self.device_register_data()
-            data['policyId'] = self.thing_id
+            data["policyId"] = self.thing_id
             res = requests.put(
-                f"{self.twin_url}/api/2/things/{self.thing_id}",
-                headers={"Content-type": "application/json"},
-                json=data
+                f"{self.twin_url}/api/2/things/{self.thing_id}", headers={"Content-type": "application/json"}, json=data
             )
-        
+
         if res.status_code == 404:
             data = self.device_register_data()
             res = requests.put(
-                f"{self.twin_url}/api/2/things/{self.thing_id}",
-                headers={"Content-type": "application/json"},
-                json=data
+                f"{self.twin_url}/api/2/things/{self.thing_id}", headers={"Content-type": "application/json"}, json=data
             )
 
         if res.status_code == 201 or res.status_code == 204:
-            self.get_logger().info(f"Device registered successfully.")
+            self.get_logger().info("Device registered successfully.")
             self.is_device_registered = True
         else:
-            self.get_logger().warn(
-                f"Device registration was unsuccessful. Status Code: {res.status_code}.")
+            self.get_logger().warn(f"Device registration was unsuccessful. Status Code: {res.status_code}.")
 
         return res.status_code
 
@@ -221,9 +205,10 @@ class Twin(Node):
         """
         Retrieves the registered telemetry properties from the twin server.
 
-        This method sends a GET request to the twin server's API to fetch the telemetry properties for the specified device.
-        If the request is successful (HTTP status code 200), it logs an informational message.
-        Otherwise, it logs a warning message with the status code and response text.
+        This method sends a GET request to the twin server's API to fetch the telemetry
+        properties for the specified device. If the request is successful (HTTP status
+        code 200), it logs an informational message. Otherwise, it logs a warning message
+        with the status code and response text.
         The method returns the telemetry properties as a dictionary.
 
         Returns:
@@ -231,14 +216,13 @@ class Twin(Node):
         """
         res = requests.get(
             f"{self.twin_url}/api/2/things/{self.thing_id}/features/telemetry/properties",
-            headers={"Content-type": "application/json"}
+            headers={"Content-type": "application/json"},
         )
 
         if res.status_code == 200:
-            self.get_logger().info(f"Telemetry properties received successfully.")
+            self.get_logger().info("Telemetry properties received successfully.")
         else:
-            self.get_logger().warn(
-                f"Getting telemetry properties was unsuccessful - {res.status_code} {res.text}.")
+            self.get_logger().warn(f"Getting telemetry properties was unsuccessful - {res.status_code} {res.text}.")
 
         payload = json.loads(res.text)
 
@@ -248,10 +232,12 @@ class Twin(Node):
         """
         Registers or updates a telemetry entry with the twin server.
 
-        This method takes a telemetry entry in JSON format, retrieves the current telemetry definitions from the twin server,
-        and updates the list of telemetry definitions to include the new entry. It sends a PUT request to the twin server's API
-        with the updated list. The method logs the success or failure of the telemetry registration or update process and returns
-        the HTTP status code of the PUT request.
+        This method takes a telemetry entry in JSON format, retrieves the current
+        telemetry definitions from the twin server, and updates the list of telemetry
+        definitions to include the new entry. It sends a PUT request to the twin
+        server's API with the updated list. The method logs the success or failure
+        of the telemetry registration or update process and returns the HTTP status
+        code of the PUT request.
 
         Args:
             telemetry_to_register (str): A JSON string representing the telemetry entry to be registered or updated.
@@ -266,12 +252,8 @@ class Twin(Node):
 
         new_definition = []
 
-        if current_definition != None:
-            filtered = filter(
-                lambda x: True if x.get(
-                    "topic") != req_telemetry.get("topic") else False,
-                current_definition
-            )
+        if current_definition is not None:
+            filtered = filter(lambda x: x.get("topic") != req_telemetry.get("topic"), current_definition)
             new_definition = list(filtered)
 
         new_definition.append(req_telemetry)
@@ -279,16 +261,15 @@ class Twin(Node):
         res = requests.put(
             f"{self.twin_url}/api/2/things/{self.thing_id}/features/telemetry/properties/definition",
             headers={"Content-type": "application/json"},
-            json=new_definition
+            json=new_definition,
         )
 
         if res.status_code == 201:
-            self.get_logger().info(f"Telemetry registered successfully.")
+            self.get_logger().info("Telemetry registered successfully.")
         elif res.status_code == 204:
-            self.get_logger().info(f"Telemetry modified successfully.")
+            self.get_logger().info("Telemetry modified successfully.")
         else:
-            self.get_logger().warn(
-                f"Telemetry registration was unsuccessful - {res.status_code}.")
+            self.get_logger().warn(f"Telemetry registration was unsuccessful - {res.status_code}.")
 
         return res.status_code
 
@@ -296,10 +277,12 @@ class Twin(Node):
         """
         Deletes a telemetry entry from the twin server.
 
-        This method takes a telemetry entry in JSON format, retrieves the current telemetry definitions from the twin server,
-        and updates the list of telemetry definitions to remove the specified entry. It sends a PUT request to the twin server's API
-        with the updated list. The method logs the success or failure of the telemetry deletion process and returns the HTTP status code
-        of the PUT request.
+        This method takes a telemetry entry in JSON format, retrieves the current
+        telemetry definitions from the twin server, and updates the list of telemetry
+        definitions to remove the specified entry. It sends a PUT request to the twin
+        server's API with the updated list. The method logs the success or failure of
+        the telemetry deletion process and returns the HTTP status code of the PUT
+        request.
 
         Args:
             telemetry_to_delete (str): A JSON string representing the telemetry entry to be deleted.
@@ -314,44 +297,29 @@ class Twin(Node):
 
         new_definition = []
 
-        if current_definition != None:
-            filtered = filter(
-                lambda x: True if x.get(
-                    "topic") != req_telemetry.get("topic") else False,
-                current_definition
-            )
+        if current_definition is not None:
+            filtered = filter(lambda x: x.get("topic") != req_telemetry.get("topic"), current_definition)
             new_definition = list(filtered)
 
         res = requests.put(
             f"{self.twin_url}/api/2/things/{self.thing_id}/features/telemetry/properties/definition",
             headers={"Content-type": "application/json"},
-            json=new_definition
+            json=new_definition,
         )
 
         if res.status_code == 204:
-            self.get_logger().info(f"Telemetry deleted successfully.")
+            self.get_logger().info("Telemetry deleted successfully.")
         else:
-            self.get_logger().warn(
-                f"Telemetry deletion was unsuccessful - {res.status_code}.")
+            self.get_logger().warn(f"Telemetry deletion was unsuccessful - {res.status_code}.")
 
         return res.status_code
 
     def device_register_data(self):
-        """ Constructs the data dictionary required for device registration with the twin server. """
+        """Constructs the data dictionary required for device registration with the twin server."""
         data = {
             "definition": self.definition,
             "attributes": self.attributes,
-            "features": {
-                "context": {
-                    "properties": {}
-                },
-                "stack": {
-                    "properties": {}
-                },
-                "telemetry": {
-                    "properties": {}
-                }
-            }
+            "features": {"context": {"properties": {}}, "stack": {"properties": {}}, "telemetry": {"properties": {}}},
         }
 
         return data
@@ -364,7 +332,7 @@ class Twin(Node):
         If the connection is successful and the device is not registered, it calls the `register_device` method.
         The internet connection status is then updated accordingly. If the connection fails, it logs a warning message.
         """
-        try:     
+        try:
             self.socket_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_.connect((self.twin_url.split("@")[1], 1883))
 
@@ -372,11 +340,12 @@ class Twin(Node):
                 self.register_device()
 
             self.internet_status = True
-        except socket.error as ex:
+        except OSError as ex:
             self.internet_status = False
             self.get_logger().warn(f"Twin Server ping failed: {ex}")
         finally:
             del self.socket_
+
 
 def main():
     rclpy.init()
@@ -384,5 +353,5 @@ def main():
     rclpy.spin(twin)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
