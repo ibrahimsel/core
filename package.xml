@@ -4,7 +4,7 @@
   <name>muto_core</name>
   <version>0.42.0</version>
   <description>Eclipse Muto Core - digital twin bridge that manages device registration, connectivity, telemetry, and stack state with a remote twin server</description>
-  <maintainer email="alp.sarica@eteration.com">Alp SARICA</maintainer>
+  <maintainer email="info@composiv.ai">composiv.ai</maintainer>
   <license file="LICENSE">EPL-2.0</license>
 
   <url type="website">https://eclipse.dev/muto/</url>
